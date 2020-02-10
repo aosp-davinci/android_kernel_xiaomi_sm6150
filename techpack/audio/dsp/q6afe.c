@@ -7986,10 +7986,14 @@ static int afe_set_cal_sp_th_vi_cfg(int32_t cal_type, size_t data_size,
 	uint32_t mode;
 
 	if (cal_data == NULL ||
+#if !((defined CONFIG_MACH_XIAOMI_F10) || (defined CONFIG_MACH_XIAOMI_G7B))
 	    data_size > sizeof(*cal_data) ||
 	    (data_size < sizeof(cal_data->cal_hdr) +
 		sizeof(cal_data->cal_data) +
 		sizeof(cal_data->cal_info.mode)) ||
+#else
+	    data_size != sizeof(*cal_data) ||
+#endif
 	    this_afe.cal_data[AFE_FB_SPKR_PROT_TH_VI_CAL] == NULL)
 		goto done;
 
@@ -8133,10 +8137,15 @@ static int afe_get_cal_sp_th_vi_param(int32_t cal_type, size_t data_size,
 	int ret = 0;
 
 	if (cal_data == NULL ||
+#ifdef CONFIG_MACH_XIAOMI_SDMMAGPIE
+	    data_size != sizeof(*cal_data) ||
+#else
 	    data_size > sizeof(*cal_data) ||
 	    (data_size < sizeof(cal_data->cal_hdr) +
 		sizeof(cal_data->cal_data) +
 		sizeof(cal_data->cal_info.mode)) ||
+	    data_size < sizeof(cal_data->cal_hdr) ||
+#endif
 	    this_afe.cal_data[AFE_FB_SPKR_PROT_TH_VI_CAL] == NULL)
 		return 0;
 
