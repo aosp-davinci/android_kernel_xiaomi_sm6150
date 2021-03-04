@@ -490,18 +490,20 @@ out:
 SYSCALL_DEFINE1(fchdir, unsigned int, fd)
 {
 	struct fd f = fdget_raw(fd);
+	struct vfsmount *mnt;
 	int error;
 
 	error = -EBADF;
 	if (!f.file)
 		goto out;
 
+	mnt = f.file->f_path.mnt;
+
 	error = -ENOTDIR;
 	if (!d_can_lookup(f.file->f_path.dentry))
 		goto out_putf;
 
-	error = inode_permission2(f.file->f_path.mnt, file_inode(f.file),
-				MAY_EXEC | MAY_CHDIR);
+	error = inode_permission2(mnt, file_inode(f.file), MAY_EXEC | MAY_CHDIR);
 	if (!error)
 		set_fs_pwd(current->fs, &f.file->f_path);
 out_putf:
@@ -737,9 +739,8 @@ static int do_dentry_open(struct file *f,
 	path_get(&f->f_path);
 	f->f_inode = inode;
 	f->f_mapping = inode->i_mapping;
-
-	/* Ensure that we skip any errors that predate opening of the file */
 	f->f_wb_err = filemap_sample_wb_err(f->f_mapping);
+	f->f_sb_err = file_sample_sb_err(f);
 
 	if (unlikely(f->f_flags & O_PATH)) {
 		f->f_mode = FMODE_PATH;
