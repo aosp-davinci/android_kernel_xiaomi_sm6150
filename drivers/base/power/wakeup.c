@@ -38,6 +38,7 @@ bool events_check_enabled __read_mostly;
 
 /* First wakeup IRQ seen by the kernel in the last cycle. */
 unsigned int pm_wakeup_irq __read_mostly;
+extern void system_sleep_status_print_enabled(void);
 
 /* If greater than 0 and the system is suspending, terminate the suspend. */
 static atomic_t pm_abort_suspend __read_mostly;
@@ -1139,7 +1140,7 @@ static int print_wakeup_source_stats(struct seq_file *m,
  * wakeup_sources_stats_show - Print wakeup sources statistics information.
  * @m: seq_file to print the statistics into.
  */
-static int wakeup_sources_stats_show(struct seq_file *m, void *unused)
+static int wakeup_sources_stats_show(struct seq_file *m, void *v)
 {
 	struct wakeup_source *ws;
 	int srcuidx;

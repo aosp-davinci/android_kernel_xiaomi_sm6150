@@ -20,6 +20,15 @@
 #define NTC_COMP_LOW_TEMP		200
 #define TEMP_COMP_TIME			5
 
+enum ffc_current_cfg {
+	TEMP_THRESHOLD,
+	LOW_TEMP_FULL_CURRENT,
+	HIGH_TEMP_FULL_CURRENT,
+	LOW_TEMP_TERMINAL_CURRENT,
+	HIGH_TEMP_TERMINAL_CURRENT,
+	USE_DTS_CONFIG,
+};
+
 struct qg_batt_props {
 	const char		*batt_type_str;
 	int			float_volt_uv;
@@ -27,6 +36,7 @@ struct qg_batt_props {
 	int			fastchg_curr_ma;
 	int			qg_profile_version;
 	int			nom_cap_uah;
+	int			ffc_current_cfg[USE_DTS_CONFIG + 1];
 };
 
 struct qg_irq_info {
@@ -84,9 +94,14 @@ struct qg_dt {
 	bool			multi_profile_load;
 	bool			tcss_enable;
 	bool			bass_enable;
+	bool			disable_hold_full;
 	bool			temp_battery_id;
 	bool			qg_page0_unused;
 	bool			ffc_iterm_change_by_temp;
+	bool			software_optimize_ffc_qg_iterm;
+	bool			shutdown_delay_enable;
+	int			*dec_rate_seq;
+	int			dec_rate_len;
 };
 
 struct qg_esr_data {
@@ -172,8 +187,9 @@ struct qpnp_qg {
 	bool			force_soc;
 	bool			fvss_active;
 	bool			tcss_active;
-	bool			bass_active;
 	bool			fastcharge_mode_enabled;
+	bool			shutdown_delay;
+	bool			bass_active;
 	int			charge_status;
 	int			charge_type;
 	int			chg_iterm_ma;
@@ -246,6 +262,8 @@ struct qpnp_qg {
 	bool			temp_comp_cfg_valid;
 	bool			temp_comp_enable;
 	struct range_data	*temp_comp_cfg;
+
+	int			batt_fake_temp;
 };
 
 struct ocv_all {

@@ -387,6 +387,11 @@ int qg_get_battery_temp(struct qpnp_qg *chip, int *temp)
 		return 0;
 	}
 
+	if (chip->batt_fake_temp != -1) {
+		*temp = chip->batt_fake_temp;
+		return 0;
+	}
+
 	rc = iio_read_channel_processed(chip->batt_therm_chan, temp);
 	if (rc < 0) {
 		pr_err("Failed reading BAT_TEMP over ADC rc=%d\n", rc);
